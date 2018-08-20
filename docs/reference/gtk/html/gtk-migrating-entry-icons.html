@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Migrating from SexyIconEntry to GtkEntry: GTK+ 2 Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
+<link rel="home" href="index.html" title="GTK+ 2 Reference Manual">
+<link rel="up" href="migrating.html" title="Part IV. Migrating from Previous Versions of GTK+">
+<link rel="prev" href="gtk-migrating-tooltips.html" title="Migrating from GtkTooltips to GtkTooltip">
+<link rel="next" href="gtk-migrating-label-links.html" title="Migrating from SexyUrlLabel to GtkLabel">
+<meta name="generator" content="GTK-Doc V1.26.1 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts"></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="migrating.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="gtk-migrating-tooltips.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="gtk-migrating-label-links.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="chapter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="gtk-migrating-entry-icons"></a>Migrating from SexyIconEntry to GtkEntry</h2></div></div></div>
+<p>
+    GTK+ 2.16 supports showing icons inside a <a class="link" href="GtkEntry.html" title="GtkEntry"><span class="type">GtkEntry</span></a>, similar to
+    SexyIconEntry. Porting from SexyIconEntry to GtkEntry is relatively
+    straightforward. The main difference between the two APIs is that
+    SexyIconEntry uses <a class="link" href="GtkImage.html" title="GtkImage"><span class="type">GtkImage</span></a> widgets in a somewhat awkward way as
+    storage vehicles for icons, while GtkEntry allows to specify icons
+    via pixbufs, stock ids, icon names or <a href="../gio/GIcon.html#GIcon-struct"><span class="type">GIcons</span></a>. So, if your code uses
+    e.g.:
+</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2</pre></td>
+        <td class="listing_code"><pre class="programlisting">image <span class="gtkdoc opt">=</span> <span class="function"><a href="GtkImage.html#gtk-image-new-from-stock">gtk_image_new_from_stock</a></span> <span class="gtkdoc opt">(</span>GTK_STOCK_NEW<span class="gtkdoc opt">,</span> GTK_ICON_SIZE_MENU<span class="gtkdoc opt">);</span>
+<span class="function">sexy_icon_entry_set_icon</span> <span class="gtkdoc opt">(</span>entry<span class="gtkdoc opt">,</span> SEXY_ICON_ENTRY_PRIMARY<span class="gtkdoc opt">,</span> image<span class="gtkdoc opt">);</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+    you can get rid of the <em class="parameter"><code>image</code></em>, and directly write:
+</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="function"><a href="GtkEntry.html#gtk-entry-set-icon-from-stock">gtk_entry_set_icon_from_stock</a></span> <span class="gtkdoc opt">(</span>entry<span class="gtkdoc opt">,</span> GTK_ENTRY_ICON_PRIMARY<span class="gtkdoc opt">,</span> GTK_STOCK_NEW<span class="gtkdoc opt">);</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  </p>
+<p>
+    The signals SexyIconEntry::icon-pressed and SexyIconEntry::icon-released
+    have been renamed to <a class="link" href="GtkEntry.html#GtkEntry-icon-press" title="The “icon-press” signal"><span class="type">“icon-press”</span></a> and <a class="link" href="GtkEntry.html#GtkEntry-icon-release" title="The “icon-release” signal"><span class="type">“icon-release”</span></a>
+    to avoid problems due to signal name clashes. Also, the signature of the
+    signals has changed from
+</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="gtkdoc kwb">void</span> <span class="gtkdoc opt">(*</span>icon_pressed<span class="gtkdoc opt">) (</span>SexyIconEntry         <span class="gtkdoc opt">*</span>entry<span class="gtkdoc opt">,</span> 
+                      SexyIconEntryPosition  icon_pos<span class="gtkdoc opt">,</span>
+                      <span class="gtkdoc kwb">int</span>                    button<span class="gtkdoc opt">)</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+to
+</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="gtkdoc kwb">void</span> <span class="gtkdoc opt">(*</span>icon_press<span class="gtkdoc opt">) (</span>GtkEntry              <span class="gtkdoc opt">*</span>entry<span class="gtkdoc opt">,</span> 
+                    GtkEntryIconPosition  icon_pos<span class="gtkdoc opt">,</span>
+                    GdkEventButton       <span class="gtkdoc opt">*</span>event<span class="gtkdoc opt">)</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+    The new signature has the advantage that the signal handler can use
+    the timestamp of the event, e.g. for passing it to <a class="link" href="GtkMenu.html#gtk-menu-popup" title="gtk_menu_popup ()"><code class="function">gtk_menu_popup()</code></a>.
+    When adapting an existing signal handler to the new signature, you 
+    should note that the button number is easily available as <em class="parameter"><code>event-&gt;button</code></em>,
+    as shown in the following example:
+</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="gtkdoc kwb">static void</span>
+<span class="function">icon_pressed_cb</span> <span class="gtkdoc opt">(</span>SexyIconEntry         <span class="gtkdoc opt">*</span>entry<span class="gtkdoc opt">,</span>
+                 SexyIconEntryPosition  position<span class="gtkdoc opt">,</span>
+                 <span class="gtkdoc kwb">int</span>                    button<span class="gtkdoc opt">,</span>
+                 gpointer               data<span class="gtkdoc opt">)</span>
+<span class="gtkdoc opt">{</span>
+  GtkMenu <span class="gtkdoc opt">*</span>menu <span class="gtkdoc opt">=</span> data<span class="gtkdoc opt">;</span>
+
+  <span class="keyword">if</span> <span class="gtkdoc opt">(</span>position <span class="gtkdoc opt">==</span> SEXY_ICON_ENTRY_PRIMARY<span class="gtkdoc opt">)</span>
+    <span class="function"><a href="GtkMenu.html#gtk-menu-popup">gtk_menu_popup</a></span> <span class="gtkdoc opt">(</span><span class="function">GTK_MENU</span> <span class="gtkdoc opt">(</span>menu<span class="gtkdoc opt">),</span> NULL<span class="gtkdoc opt">,</span> NULL<span class="gtkdoc opt">,</span> NULL<span class="gtkdoc opt">,</span> NULL<span class="gtkdoc opt">,</span>
+                    button<span class="gtkdoc opt">,</span> GDK_CURRENT_TIME<span class="gtkdoc opt">);</span>
+<span class="gtkdoc opt">}</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+    can be ported as:
+</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="gtkdoc kwb">static void</span>
+<span class="function">icon_press_cb</span> <span class="gtkdoc opt">(</span>GtkEntry             <span class="gtkdoc opt">*</span>entry<span class="gtkdoc opt">,</span>
+               GtkEntryIconPosition  position<span class="gtkdoc opt">,</span>
+               GdkEventButton       <span class="gtkdoc opt">*</span>event<span class="gtkdoc opt">,</span>
+               gpointer              data<span class="gtkdoc opt">)</span>
+<span class="gtkdoc opt">{</span>
+  GtkMenu <span class="gtkdoc opt">*</span>menu <span class="gtkdoc opt">=</span> data<span class="gtkdoc opt">;</span>
+
+  <span class="keyword">if</span> <span class="gtkdoc opt">(</span>position <span class="gtkdoc opt">==</span> GTK_ENTRY_ICON_PRIMARY<span class="gtkdoc opt">)</span>
+    <span class="function"><a href="GtkMenu.html#gtk-menu-popup">gtk_menu_popup</a></span> <span class="gtkdoc opt">(</span><span class="function">GTK_MENU</span> <span class="gtkdoc opt">(</span>menu<span class="gtkdoc opt">),</span> NULL<span class="gtkdoc opt">,</span> NULL<span class="gtkdoc opt">,</span> NULL<span class="gtkdoc opt">,</span> NULL<span class="gtkdoc opt">,</span>
+                    event<span class="gtkdoc opt">-&gt;</span>button<span class="gtkdoc opt">,</span> event<span class="gtkdoc opt">-&gt;</span>time<span class="gtkdoc opt">);</span>
+<span class="gtkdoc opt">}</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  </p>
+<p>
+    Another difference is that SexyIconEntry offers manual control of
+    the icon prelighting, via <code class="function">sexy_icon_entry_set_icon_highlight()</code>. 
+    <a class="link" href="GtkEntry.html" title="GtkEntry"><span class="type">GtkEntry</span></a> prelights automatically when appropriate, depending on 
+    whether the icon is activatable and sensitive. You should make
+    sure that your icons are properly marked as activatable or nonactivatable
+    and sensitive or insensitive:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem"><p>
+        Sensitive, but non-activatable icons are
+        good for purely informational purposes.
+      </p></li>
+<li class="listitem"><p>
+        Icons should be marked as insensitive if the
+        function that they trigger is currently not available.
+      </p></li>
+</ul></div>
+<p>
+  </p>
+<p>
+    GtkEntry has no direct equivalent of the special-purpose function
+    <code class="function">sexy_icon_entry_add_clear_button()</code>. If you need this functionality,
+    the following code works:
+</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="gtkdoc kwb">static void</span>
+<span class="function">icon_pressed_cb</span> <span class="gtkdoc opt">(</span>GtkEntry       <span class="gtkdoc opt">*</span>entry<span class="gtkdoc opt">,</span>
+                 gint            position<span class="gtkdoc opt">,</span>
+                 GdkEventButton <span class="gtkdoc opt">*</span>event<span class="gtkdoc opt">,</span>
+                 gpointer        data<span class="gtkdoc opt">)</span>
+<span class="gtkdoc opt">{</span>
+  <span class="keyword">if</span> <span class="gtkdoc opt">(</span>position <span class="gtkdoc opt">==</span> GTK_ENTRY_ICON_SECONDARY<span class="gtkdoc opt">)</span>
+    <span class="function"><a href="GtkEntry.html#gtk-entry-set-text">gtk_entry_set_text</a></span> <span class="gtkdoc opt">(</span>entry<span class="gtkdoc opt">,</span> <span class="string">&quot;&quot;</span><span class="gtkdoc opt">);</span>
+<span class="gtkdoc opt">}</span>
+
+<span class="gtkdoc kwb">static void</span>
+<span class="function">text_changed_cb</span> <span class="gtkdoc opt">(</span>GtkEntry   <span class="gtkdoc opt">*</span>entry<span class="gtkdoc opt">,</span>
+                 GParamSpec <span class="gtkdoc opt">*</span>pspec<span class="gtkdoc opt">,</span>
+                 GtkWidget  <span class="gtkdoc opt">*</span>button<span class="gtkdoc opt">)</span>
+<span class="gtkdoc opt">{</span>
+  gboolean has_text<span class="gtkdoc opt">;</span>
+
+  has_text <span class="gtkdoc opt">=</span> <span class="function"><a href="GtkEntry.html#gtk-entry-get-text-length">gtk_entry_get_text_length</a></span> <span class="gtkdoc opt">(</span>entry<span class="gtkdoc opt">) &gt;</span> <span class="number">0</span><span class="gtkdoc opt">;</span>
+  <span class="function"><a href="GtkEntry.html#gtk-entry-set-icon-sensitive">gtk_entry_set_icon_sensitive</a></span> <span class="gtkdoc opt">(</span>entry<span class="gtkdoc opt">,</span>
+                                GTK_ENTRY_ICON_SECONDARY<span class="gtkdoc opt">,</span>
+                                has_text<span class="gtkdoc opt">);</span>
+<span class="gtkdoc opt">}</span>
+
+
+  <span class="comment">/* ... */</span>
+ 
+  <span class="comment">/* Set up the clear icon */</span>
+  <span class="function"><a href="GtkEntry.html#gtk-entry-set-icon-from-stock">gtk_entry_set_icon_from_stock</a></span> <span class="gtkdoc opt">(</span><span class="function">GTK_ENTRY</span> <span class="gtkdoc opt">(</span>entry<span class="gtkdoc opt">),</span>
+                                 GTK_ENTRY_ICON_SECONDARY<span class="gtkdoc opt">,</span>
+                                 GTK_STOCK_CLEAR<span class="gtkdoc opt">);</span>
+  <span class="function"><a href="../gobject/gobject-Signals.html#g-signal-connect">g_signal_connect</a></span> <span class="gtkdoc opt">(</span>entry<span class="gtkdoc opt">,</span> <span class="string">&quot;icon-press&quot;</span><span class="gtkdoc opt">,</span>
+                    <span class="function"><a href="../gobject/gobject-Closures.html#G-CALLBACK:CAPS">G_CALLBACK</a></span> <span class="gtkdoc opt">(</span>icon_pressed_cb<span class="gtkdoc opt">),</span> NULL<span class="gtkdoc opt">);</span>
+  <span class="function"><a href="../gobject/gobject-Signals.html#g-signal-connect">g_signal_connect</a></span> <span class="gtkdoc opt">(</span>entry<span class="gtkdoc opt">,</span> <span class="string">&quot;notify::text&quot;</span><span class="gtkdoc opt">,</span>
+                    <span class="function"><a href="../gobject/gobject-Closures.html#G-CALLBACK:CAPS">G_CALLBACK</a></span> <span class="gtkdoc opt">(</span>text_changed_cb<span class="gtkdoc opt">),</span> find_button<span class="gtkdoc opt">);</span>
+ 
+  <span class="comment">/* ... */</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  </p>
+</div>
+<div class="footer">
+<hr>Generated by GTK-Doc V1.26.1</div>
+</body>
+</html>
