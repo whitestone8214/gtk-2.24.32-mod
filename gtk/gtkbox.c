@@ -1262,5 +1262,15 @@ gtk_box_forall (GtkContainer *container,
     }
 }
 
+int gtk_box_n_children (GtkBox *box) {return g_list_length (box->children);}
+GtkWidget *gtk_box_nth_child (GtkBox *box, int nth) {
+	if (gtk_box_n_children (box) < 1) return NULL;
+	
+	int _nth = nth;
+	if ((_nth < 0) || (_nth >= gtk_box_n_children (box))) _nth = gtk_box_n_children (box) - 1;
+	
+	return (GtkWidget *) g_list_nth_data (box->children, _nth);
+}
+
 #define __GTK_BOX_C__
 #include "gtkaliasdef.c"
