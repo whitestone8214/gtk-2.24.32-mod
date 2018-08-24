@@ -1269,7 +1269,7 @@ GtkWidget *gtk_box_nth_child (GtkBox *box, int nth) {
 	int _nth = nth;
 	if ((_nth < 0) || (_nth >= gtk_box_n_children (box))) _nth = gtk_box_n_children (box) - 1;
 	
-	return (GtkWidget *) g_list_nth_data (box->children, _nth);
+	return (GtkWidget *) ((GtkBoxChild *) g_list_nth_data (box->children, _nth))->widget;
 }
 
 #define __GTK_BOX_C__
