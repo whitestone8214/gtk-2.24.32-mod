@@ -1594,6 +1594,31 @@ _gdk_gc_update_context (GdkGC          *gc,
 
 }
 
+void gdk_gc_set_color_stroke_a (GdkGC *pencil, guint32 color) {
+	if (pencil == NULL) return;
+	
+	GdkColor _stroke; _stroke.pixel = color;
+	gdk_gc_set_foreground (pencil, &_stroke);
+}
+void gdk_gc_set_color_stroke_b (GdkGC *pencil, guint16 red, guint16 green, guint16 blue) {
+	if (pencil == NULL) return;
+	
+	GdkColor _stroke; _stroke.red = red; _stroke.green = green; _stroke.blue = blue;
+	gdk_gc_set_rgb_fg_color (pencil, &_stroke);
+}
+void gdk_gc_set_color_fill_a (GdkGC *pencil, guint32 color) {
+	if (pencil == NULL) return;
+	
+	GdkColor _fill; _fill.pixel = color;
+	gdk_gc_set_background (pencil, &_fill);
+}
+void gdk_gc_set_color_fill_b (GdkGC *pencil, guint16 red, guint16 green, guint16 blue) {
+	if (pencil == NULL) return;
+	
+	GdkColor _fill; _fill.red = red; _fill.green = green; _fill.blue = blue;
+	gdk_gc_set_rgb_bg_color (pencil, &_fill);
+}
+
 
 #define __GDK_GC_C__
 #include "gdkaliasdef.c"

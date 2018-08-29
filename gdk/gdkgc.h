@@ -290,6 +290,11 @@ void         gdk_gc_set_rgb_bg_color (GdkGC          *gc,
 				      const GdkColor *color);
 GdkScreen *  gdk_gc_get_screen	     (GdkGC          *gc);
 
+void gdk_gc_set_color_stroke_a (GdkGC *pencil, guint32 color);
+void gdk_gc_set_color_stroke_b (GdkGC *pencil, guint16 red, guint16 green, guint16 blue);
+void gdk_gc_set_color_fill_a (GdkGC *pencil, guint32 color);
+void gdk_gc_set_color_fill_b (GdkGC *pencil, guint16 red, guint16 green, guint16 blue);
+
 #define gdk_gc_destroy                 g_object_unref
 #endif /* GDK_DISABLE_DEPRECATED */
 
